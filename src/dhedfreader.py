@@ -12,6 +12,7 @@ Copyright (c) 2012 Boris Reuderink.
 import re, datetime, operator, logging, sys
 import numpy as np
 from collections import namedtuple
+from functools import reduce
 
 EVENT_CHANNEL = 'EDF Annotations'
 log = logging.getLogger(__name__)
@@ -182,7 +183,7 @@ def load_edf(edffile):
       description : list with strings
         Contains (multiple?) descriptions of the annotation event.
   '''
-  if isinstance(edffile, basestring):
+  if isinstance(edffile, str):
     with open(edffile, 'rb') as f:
       return load_edf(f)  # convert filename to file
 
