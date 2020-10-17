@@ -2,3 +2,4 @@
 *.pyc
 src/.vscode/settings.json
 src/data_norm/collated.npz
+information/debug.log
