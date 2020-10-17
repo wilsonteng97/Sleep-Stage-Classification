@@ -8,19 +8,15 @@ import glob
 import math
 import ntpath
 import os
-import shutil
 import pdb
-
-
+import shutil
 from datetime import datetime
 
 import numpy as np
 import pandas as pd
-
 from mne.io import concatenate_raws, read_raw_edf
 
 import dhedfreader
-
 
 # Label values
 W = 0
@@ -64,13 +60,21 @@ EPOCH_SEC_SIZE = 30
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data_dir", type=str, default="./sleep-edf-database-expanded-1.0.0/sleep-cassette",
+    # parser.add_argument("--data_dir", type=str, default="./sleep-edf-database-expanded-1.0.0/sleep-cassette",
+    #                     help="File path to the CSV or NPY file that contains walking data.")
+    # parser.add_argument("--output_dir", type=str, default="./eeg_fpz_cz",
+    #                     help="Directory where to save outputs.")
+    parser.add_argument("--data_dir", type=str, default=r".\data",
                         help="File path to the CSV or NPY file that contains walking data.")
-    parser.add_argument("--output_dir", type=str, default="./eeg_fpz_cz",
+    parser.add_argument("--output_dir", type=str, default=r".\data_norm",
                         help="Directory where to save outputs.")
     parser.add_argument("--select_ch", type=str, default="EEG Fpz-Cz",
                         help="File path to the trained model used to estimate walking speeds.")
     args = parser.parse_args()
+
+    collate_x = []
+    collate_y = []
+    size_arr = []
 
     # Output dir
     if not os.path.exists(args.output_dir):
@@ -204,19 +208,44 @@ def main():
         y = y[select_idx]
         print("Data after selection: {}, {}".format(x.shape, y.shape))
 
+        # Min/Max normalization on x
+        x = x.reshape(-1)
+        x_max, x_min = max(x), min(x)
+        norm_x = (x - x_min) / (x_max - x_min)
+        norm_x = norm_x.reshape(-1, 3000)
+
         # Save
         filename = ntpath.basename(psg_fnames[i]).replace("-PSG.edf", ".npz")
         save_dict = {
-            "x": x, 
+            "x": norm_x, 
             "y": y, 
             "fs": sampling_rate,
             "ch_label": select_ch,
             "header_raw": h_raw,
             "header_annotation": h_ann,
         }
+
+        collate_x.append(norm_x)
+        collate_y.append(y)
+        size_arr.append(y.size)
         np.savez(os.path.join(args.output_dir, filename), **save_dict)
 
         print ("\n=======================================\n")
+    
+    # Collate data
+    print(f"Collating {sum(size_arr)} data...\n")
+    collate_x = np.vstack(collate_x)
+    collate_y = np.hstack(collate_y)
+
+    save_dict = {
+        "x": collate_x, 
+        "y": collate_y, 
+        "size_arr": size_arr
+    }
+
+    np.savez(os.path.join(args.output_dir, "collated.npz"), **save_dict)
+    print("Collating done.")
+
 
 
 if __name__ == "__main__":
