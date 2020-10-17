@@ -233,7 +233,7 @@ def main():
         print ("\n=======================================\n")
     
     # Collate data
-    print(f"Collating {sum(size_arr)} data...\n")
+    print(f"Collating {sum(size_arr)} data blocks...\n")
     collate_x = np.vstack(collate_x)
     collate_y = np.hstack(collate_y)
 
