@@ -157,7 +157,7 @@ def main():
             select_idx = np.arange(len(raw_ch_df))
         print ("after remove unwanted: {}".format(select_idx.shape))
 
-        # Select only the data with labels
+        # Select only the data with labels (double checking)
         print ("before intersect label: {}".format(select_idx.shape))
         label_idx = np.hstack(label_idx)
         select_idx = np.intersect1d(select_idx, label_idx)
