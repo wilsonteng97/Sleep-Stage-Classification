@@ -19,17 +19,14 @@ class Dataset():
     Block/Chunk -> Refers to the contiguous set of time-series x values (3000 in this situation) that has a corresponding class.
     """
     
-    def __init__(self, collated_npz_pth, 
-                 config=Config()):
-        
-        self.npz_pth = collated_npz_pth
+    def __init__(self, collated_data_path, config=Config()):
+        self.data_path = collated_data_path
         self.config = config
         
-        data = np.load(self.npz_pth, allow_pickle=True)
+        data = np.load(self.data_path, allow_pickle=True)
         self.file_headers = data.files
-        self.x = data["x"]
-        self.y = data["y"]
-        self.size_arr = list(data["size_arr"])
+        self.x = data['x']
+        self.y = data['y']
         
         self.xlen = len(self.x)
         self.ylen = len(self.y)
@@ -50,6 +47,7 @@ class Dataset():
     """ TODO : Get DataFrame of extracted features. """
     def getDF(self):
         data_extractor = DataExtractor(self.x, self.y, self.config)
+        # TODO：return dataframe
         return data_extractor.generateDF()
 
     """ Get X value of data. Shape will be (N, 3000). """
@@ -59,10 +57,6 @@ class Dataset():
     """ Get y value of data. Shape will be (N). """
     def getY(self):
         return self.y
-
-    """ TODO: Generate Dataframe """
-    def getSleepStagePlot(self, start_idx, end_idx):
-        print("To-Do")
     
     """ Get a compressed string representation of contiguous blocks with the same class. """
     def getCompressedYString(self):
@@ -177,6 +171,6 @@ class Dataset():
 
 
 if __name__ == "__main__":
-    DATA_PATH = r"C:\Users\wilso\Desktop\Sleep-Stage-Classification\src\data_norm\collated.npz"
-    dataset = Dataset(DATA_PATH)
+    data_path = r"C:\Users\wilso\Desktop\Sleep-Stage-Classification\src\data_norm\collated.npz"
+    dataset = Dataset(data_path)
     pprint(dataset.getClassCount())
