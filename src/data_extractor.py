@@ -1,8 +1,9 @@
 import numpy as np
 import pandas as pd
-from scipy.signal import periodogram
 from scipy.special import digamma
+from scipy.stats import kurtosis, skew
 
+import processing as p
 from config import Config
 from error import Error
 
@@ -17,19 +18,57 @@ class DataExtractor():
         self.x = x
         self.y = y
 
+        self.delta = p.lowpass_filter(x, 4, config.sampling_rate, 14)
+        self.theta = p.bandpass_filter(x, 4, 8, config.sampling_rate, 14)
+        self.alpha = p.bandpass_filter(x, 8, 12, config.sampling_rate, 14)
+        self.sigma = p.bandpass_filter(x, 12, 15, config.sampling_rate, 14)
+        self.beta1 = p.bandpass_filter(x, 15, 22, config.sampling_rate, 14)
+        self.beta2 = p.bandpass_filter(x, 22, 30, config.sampling_rate, 14)
+        self.gamma1 = p.bandpass_filter(x, 30, 40, config.sampling_rate, 14)
+        self.gamma2 = p.bandpass_filter(x, 40, 49.5, config.sampling_rate, 14)
+
+        self.freq_band_dict = {"delta": self.delta,
+                               "theta": self.theta, 
+                               "alpha": self.alpha, 
+                               "sigma": self.sigma, 
+                               "beta1": self.beta1, 
+                               "beta2": self.beta2, 
+                               "gamma1": self.gamma1, 
+                               "gamma2": self.gamma2
+                               }
+        del self.delta, self.theta, self.alpha, self.sigma, self.beta1, self.beta2, self.gamma1, self.gamma2
+        print("freq bands processing done.")
+
 
     """ TODO : Function to generate pandas DataFrame with all the features stipulated in config. """
     def generateDF(self):
         # TODO：return dataframe
-        print("TODO")
+        df = pd.DataFrame()
+        df['y'] = self.y
+        df['avg'] = self.calculateMean(self.x)
+        df['std'] = self.calculateStandardDeviation(self.x)
+        df['skew'] = self.calculateSkew(self.x)
+        df['kurtosis'] = self.calculateKurtosis(self.x)
 
+        for i, band_name in enumerate(self.freq_band_dict.keys()):
+            data = self.freq_band_dict[band_name]
+            df[band_name + 'Avg'] = self.calculateMean(data)
+            df[band_name + 'STD'] = self.calculateStandardDeviation(data)
+            df[band_name + 'Skew'] = self.calculateSkew(data)
+            df[band_name + 'Kurtosis'] = self.calculateKurtosis(data)
+        return df
+    
+    def calculateMean(self, arr):
+        return arr.mean(axis=1)
 
-    def calculateMean(self):
-        return self.x.mean(axis=1)
+    def calculateStandardDeviation(self, arr):
+        return arr.std(axis=1)
 
+    def calculateSkew(self, arr):
+        return skew(arr, axis=1)
 
-    def calculateStandardDeviation(self):
-        return self.x.std(axis=1)
+    def calculateKurtosis(self, arr):
+        return kurtosis(arr, axis=1)
     
 
     def calculateHjorth(self):

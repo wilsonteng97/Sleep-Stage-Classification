@@ -45,10 +45,13 @@ class Dataset():
         del data
     
     """ TODO : Get DataFrame of extracted features. """
-    def getDF(self):
-        data_extractor = DataExtractor(self.x, self.y, self.config)
+    def getDF(self, save_pth):
         # TODO：return dataframe
-        return data_extractor.generateDF()
+        data_extractor = DataExtractor(self.x, self.y, self.config)
+        df = data_extractor.generateDF()
+        df.to_csv(save_pth, index=False, header=True)
+        df = pd.read_csv(save_pth)
+        return df
 
     """ Get X value of data. Shape will be (N, 3000). """
     def getX(self):
