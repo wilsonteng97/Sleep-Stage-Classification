@@ -18,7 +18,7 @@ class DataExtractor():
 
 
     """ TODO : Function to generate pandas DataFrame with all the features stipulated in config. """
-    def generateDF():
+    def generateDF(self):
         # TODO：return dataframe
         print("TODO")
 
