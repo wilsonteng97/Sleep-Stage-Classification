@@ -64,9 +64,9 @@ def main():
     #                     help="File path to the CSV or NPY file that contains walking data.")
     # parser.add_argument("--output_dir", type=str, default="./eeg_fpz_cz",
     #                     help="Directory where to save outputs.")
-    parser.add_argument("--data_dir", type=str, default=r".\data",
+    parser.add_argument("--data_dir", type=str, default=r"./data",
                         help="File path to the CSV or NPY file that contains walking data.")
-    parser.add_argument("--output_dir", type=str, default=r".\data_norm",
+    parser.add_argument("--output_dir", type=str, default=r"./data_norm",
                         help="Directory where to save outputs.")
     parser.add_argument("--select_ch", type=str, default="EEG Fpz-Cz",
                         help="File path to the trained model used to estimate walking speeds.")
