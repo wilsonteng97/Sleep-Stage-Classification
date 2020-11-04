@@ -4,6 +4,7 @@ from scipy.signal import periodogram
 from scipy.special import digamma
 
 from config import Config
+from error import Error
 
 
 class DataExtractor():
@@ -56,7 +57,7 @@ class DataExtractor():
 
 
     # TODO: WIP
-    def calculateKFD(a):
+    def calculateKFD(self, a):
         distance = np.abs(np.ediff1d(a))
         LL = distance.sum() #'line length'
         LL_normalized = np.log10(np.divide(LL, distance.mean())) #original paper uses constant hyperparameter M=1
@@ -66,10 +67,10 @@ class DataExtractor():
 
 
     # TODO: WIP
-    def calculateHurstExponent(a):
+    def calculateHurstExponent(self, a):
         alen = len(a)
         if alen < 100:
-            raise f"Not enough datapoints to calculate Hurst Exp | Only {alen} of the required 100."
+            raise Error(f"Not enough datapoints to calculate Hurst Exp | Only {alen} of the required 100.")
         lags = getLags(alen)
         
         ln_lag_ls = []
@@ -105,7 +106,7 @@ class DataExtractor():
 
     #Normalized Spectral Entropy, https://raphaelvallat.com/entropy/build/html/_modules/entropy/entropy.html
     # TODO: WIP
-    def calculateSE(a):
+    def calculateSE(self, a):
         _, psd = periodogram(a, 100)  #fft transform
         psd_norm = np.divide(psd, psd.sum()) #power spectral density, measure of signal's power content versus frequency
         se = -np.multiply(psd_norm, np.log2(psd_norm)).sum()
@@ -121,7 +122,7 @@ class DataExtractor():
     #Kraskov entropy (KE) an estimate for Shannon entropy using N samples of an m-dimensional random vector x
     #very confused???
     # TODO: WIP
-    def calculateKE(a):
+    def calculateKE(self, a):
         N = len(a)
         k = int(np.sqrt(N)) # sqrt of epoch len (3000)
         sum_ = 0
