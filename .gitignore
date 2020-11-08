@@ -3,3 +3,4 @@
 src/.vscode/settings.json
 src/data_norm/collated.npz
 information/debug.log
+src/data_norm/collated_freq_bands.npz
