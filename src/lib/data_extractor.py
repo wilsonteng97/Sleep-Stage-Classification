@@ -1,3 +1,5 @@
+import os
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -14,31 +16,40 @@ class DataExtractor():
     """ 
     DataExtractor class contains functions that extract features from x and returns a DataFrame.
     """
-    def __init__(self, x, y, config=Config()):
+    def __init__(self, x, y, config=Config(), collated_freq_bands_path=None):
         assert x.shape[1] == 3000
         assert x.shape[0] == y.shape[0]
         self.x = x
         self.y = y
 
-        self.delta = p.lowpass_filter(x, 4, config.sampling_rate, 14)
-        self.theta = p.bandpass_filter(x, 4, 8, config.sampling_rate, 14)
-        self.alpha = p.bandpass_filter(x, 8, 12, config.sampling_rate, 14)
-        self.sigma = p.bandpass_filter(x, 12, 15, config.sampling_rate, 14)
-        self.beta1 = p.bandpass_filter(x, 15, 22, config.sampling_rate, 14)
-        self.beta2 = p.bandpass_filter(x, 22, 30, config.sampling_rate, 14)
-        self.gamma1 = p.bandpass_filter(x, 30, 40, config.sampling_rate, 14)
-        self.gamma2 = p.bandpass_filter(x, 40, 49.5, config.sampling_rate, 14)
+        if os.path.exists(collated_freq_bands_path):
+            self.freq_band_dict = np.load(collated_freq_bands_path, allow_pickle=True)
+            print("self.freq_band_dict loaded.")
+        else:
+            self.delta = p.lowpass_filter(x, 4, config.sampling_rate, 14)
+            self.theta = p.bandpass_filter(x, 4, 8, config.sampling_rate, 14)
+            self.alpha = p.bandpass_filter(x, 8, 12, config.sampling_rate, 14)
+            self.sigma = p.bandpass_filter(x, 12, 15, config.sampling_rate, 14)
+            self.beta1 = p.bandpass_filter(x, 15, 22, config.sampling_rate, 14)
+            self.beta2 = p.bandpass_filter(x, 22, 30, config.sampling_rate, 14)
+            self.gamma1 = p.bandpass_filter(x, 30, 40, config.sampling_rate, 14)
+            self.gamma2 = p.bandpass_filter(x, 40, 49.5, config.sampling_rate, 14)
 
-        self.freq_band_dict = {"delta": self.delta,
-                               "theta": self.theta, 
-                               "alpha": self.alpha, 
-                               "sigma": self.sigma, 
-                               "beta1": self.beta1, 
-                               "beta2": self.beta2, 
-                               "gamma1": self.gamma1, 
-                               "gamma2": self.gamma2
-                               }
-        del self.delta, self.theta, self.alpha, self.sigma, self.beta1, self.beta2, self.gamma1, self.gamma2
+            self.freq_band_dict = {
+                "delta": self.delta,
+                "theta": self.theta, 
+                "alpha": self.alpha, 
+                "sigma": self.sigma, 
+                "beta1": self.beta1, 
+                "beta2": self.beta2, 
+                "gamma1": self.gamma1, 
+                "gamma2": self.gamma2
+            }
+            print("self.freq_band_dict created.")
+
+            np.savez(collated_freq_bands_path, **self.freq_band_dict)
+
+            del self.delta, self.theta, self.alpha, self.sigma, self.beta1, self.beta2, self.gamma1, self.gamma2
         print("freq bands processing done.")
 
 

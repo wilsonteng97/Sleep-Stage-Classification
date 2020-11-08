@@ -21,6 +21,7 @@ class Dataset():
     
     def __init__(self, collated_data_path, config=Config()):
         self.data_path = collated_data_path
+        self.data_dir = os.path.dirname(self.data_path)
         self.config = config
         
         data = np.load(self.data_path, allow_pickle=True)
@@ -46,8 +47,8 @@ class Dataset():
     
     """ TODO : Get DataFrame of extracted features. """
     def getDF(self, save_pth):
-        # TODO：return dataframe
-        data_extractor = DataExtractor(self.x, self.y, self.config)
+        collated_freq_band_path = os.path.join(self.data_dir, "collated_freq_bands.npz")
+        data_extractor = DataExtractor(self.x, self.y, self.config, collated_freq_bands_path=collated_freq_band_path)
         df = data_extractor.generateDF()
         df.to_csv(save_pth, index=False, header=True)
         df = pd.read_csv(save_pth)
