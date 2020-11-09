@@ -3,6 +3,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from scipy.fft import fft, ifft
 from scipy.signal import periodogram
 from scipy.special import digamma
 from scipy.stats import kurtosis, skew
@@ -24,7 +25,7 @@ class DataExtractor():
 
         if os.path.exists(collated_freq_bands_path):
             self.freq_band_dict = np.load(collated_freq_bands_path, allow_pickle=True)
-            print("self.freq_band_dict loaded.")
+            print(f"self.freq_band_dict loaded from directory {os.path.dirname(collated_freq_bands_path)}.")
         else:
             self.delta = p.lowpass_filter(x, 4, config.sampling_rate, 14)
             self.theta = p.bandpass_filter(x, 4, 8, config.sampling_rate, 14)
@@ -43,7 +44,16 @@ class DataExtractor():
                 "beta1": self.beta1, 
                 "beta2": self.beta2, 
                 "gamma1": self.gamma1, 
-                "gamma2": self.gamma2
+                "gamma2": self.gamma2,
+                "xFFT": fft(self.x),
+                "deltaFFT": fft(self.delta),
+                "thetaFFT": fft(self.theta), 
+                "alphaFFT": fft(self.alpha), 
+                "sigmaFFT": fft(self.sigma), 
+                "beta1FFT": fft(self.beta1), 
+                "beta2FFT": fft(self.beta2), 
+                "gamma1FFT": fft(self.gamma1), 
+                "gamma2FFT": fft(self.gamma2),
             }
             print("self.freq_band_dict created.")
 
