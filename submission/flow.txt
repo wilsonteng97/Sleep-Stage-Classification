@@ -1,0 +1,16 @@
+Here is the flow:
+
+1. Taking 39 raw files (too large, not included in this file), feed into 'prepare_all_physionet.py' and it generates 'collated.npz'. It contains all data of 39 files.
+    # 'prepare_all_physionet.py' is modified from 'prepare_physionet.py'. 'prepare_physionet.py' can generate 39 files in folder 'eeg_fpz_cz', but merging all data into one file is easier for further analysis.
+    # 'prepare_all_physionet.py' requires 'dhedfreader.py'
+
+2. Taking 'collated.npz', 'dataset.py' reads all data and uses a python class to generate 'result.csv file'. The columns of 'result.csv' are features and label, rows are individual records. 'dataset.py' requires 'data_extractor.py' to implement both time domain and frequency domain feature extraction. 'dataset.py' requires 'config.py' for label matching.
+
+3. 'eda_tools.ipynb' also takes npz files as input, and generates impressive plots for data exploration and analysis. The outputs are relevant information and plots.
+
+4. 'Normalization.ipynb' and 'feature_selection.ipynb' normalizes data from 'result.csv'. The file 'result_new.csv' is cleaned data. 'train_x.csv', 'train_y.csv', 'test_x.csv', and 'test_y' csv are generated from 'result_new.csv'.
+    #train-test split ratio is 80:20
+    #'KNN.ipynb', 'LogisticRegression.ipynb', 'NaiveBayes.ipynb', 'neural network.ipynb', 'randomForest.ipynb', 'svm.ipynb' and 'classificationTree.ipynb' are explored models.
+    #'testacc256_64_32.txt' records the test accuracies against training epochs. (Best result)
+    #'tree_300.png gives a visualization of random forest with 300 estimators'
+    #Detailed results can be checked by running above .ipynb files
